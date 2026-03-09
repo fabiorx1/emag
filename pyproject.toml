@@ -1,0 +1,9 @@
+[project]
+name = "emag"
+version = "0.1.0"
+description = "MANIM para criação de animações para estudo de eletromagnetismo aplicado."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "manim>=0.20.1",
+]
