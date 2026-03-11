@@ -3,7 +3,15 @@ from manim import *
 config.media_width = "75%"
 config.verbosity = "WARNING"
 
-class LorentzPermeabilidade(Scene):
+class LorentzEConstitutivas(Scene):
+    LIMIAR_TEXTO_LONGO = 70
+
+    def esperar_texto(self, tempo_base: float, *textos: str):
+        # Textos longos ganham +3s; textos curtos ganham +2s.
+        total_caracteres = sum(len(texto) for texto in textos)
+        tempo_extra = 3 if total_caracteres >= self.LIMIAR_TEXTO_LONGO else 2
+        self.wait(tempo_base + tempo_extra)
+
     def parte_1_carga_e_forca(self):
         # Texto inicial
         text_carga_q_1 = Tex(
@@ -29,7 +37,7 @@ class LorentzPermeabilidade(Scene):
         
         # Mostra a carga estática
         self.play(FadeIn(circle), FadeIn(label_q))
-        self.wait(1)
+        self.esperar_texto(1, "Admitindo uma carga q com massa desprezível")
 
         # Texto sobre movimento
         text_movimento = Tex(
@@ -51,7 +59,7 @@ class LorentzPermeabilidade(Scene):
             label_v.animate.set_opacity(1)
         )
         carga_q.add_updater(update_move)
-        self.wait(3)
+        self.esperar_texto(3, "movimentando-se a uma velocidade v numa região do espaço")
 
         # Pergunta
         text_pergunta = VGroup(
@@ -62,7 +70,11 @@ class LorentzPermeabilidade(Scene):
                 .arrange(DOWN, aligned_edge=LEFT)\
                 .next_to(text_movimento, DOWN, aligned_edge=LEFT)
         self.play(Write(text_pergunta), run_time=3)
-        self.wait(1)
+        self.esperar_texto(
+            1,
+            "Se esta carga ficar sujeita a uma força, diz-se que ela está em uma região denominada região de campo eletromagnético.",
+            "O nome dessa força é Força de Lorentz."
+        )
         
         # Retira o movimento da carga para focar na fórmula
         carga_q.remove_updater(update_move)
@@ -75,11 +87,16 @@ class LorentzPermeabilidade(Scene):
         self.wait(1)
     
     def parte_2_detalhando_forca(self):
+        title_lorentz = Tex("Força de Lorentz", font_size=40, color=WHITE).to_edge(UP)
         formula_lorentz = MathTex(
             r"\vec{F}", r"=", r"q", r"\vec{e}", r"+", r"q", r"(\vec{v} \times \vec{b})",
-            font_size=34).shift(UP * 0.5)
-        self.play(Write(formula_lorentz))
-        self.wait(1)
+            font_size=34).shift(UP * 0.2)
+        self.play(Write(title_lorentz), Write(formula_lorentz))
+        self.esperar_texto(
+            1,
+            "Força de Lorentz",
+            "F = q e + q(v x b)"
+        )
         electric_part = VGroup(formula_lorentz[2], formula_lorentz[3])
         framebox1 = SurroundingRectangle(electric_part, buff = .1)
         label_eletrica = Tex(r"Força Elétrica ($q\vec{e}$)", font_size=24, color=YELLOW)
@@ -88,7 +105,7 @@ class LorentzPermeabilidade(Scene):
             Create(framebox1),
             FadeIn(label_eletrica)
         )
-        self.wait(2)
+        self.esperar_texto(2, "Força Elétrica (q e)")
         
         # Destacando Força Magnética
         magnetic_part = VGroup(formula_lorentz[5], formula_lorentz[6])
@@ -101,7 +118,7 @@ class LorentzPermeabilidade(Scene):
             FadeOut(label_eletrica),
             FadeIn(label_magnetica)
         )
-        self.wait(2)
+        self.esperar_texto(2, "Força Magnética (q v x b)")
 
         explanation_vel = VGroup(
             Tex(r"Note que a componente magnética depende da velocidade $\vec{v}$.", font_size=24),
@@ -109,10 +126,15 @@ class LorentzPermeabilidade(Scene):
         ).arrange(DOWN, aligned_edge=LEFT).next_to(formula_lorentz, DOWN, buff=1.5)
 
         self.play(Write(explanation_vel))
-        self.wait(3)
+        self.esperar_texto(
+            3,
+            "Note que a componente magnética depende da velocidade v.",
+            "Se v=0, apenas a força elétrica atua."
+        )
 
         # Limpar a cena para Permeabilidade
         self.play(
+            FadeOut(title_lorentz),
             FadeOut(formula_lorentz),
             FadeOut(framebox2),
             FadeOut(label_magnetica),
@@ -123,14 +145,18 @@ class LorentzPermeabilidade(Scene):
         title_permeabilidade = Tex("Permeabilidade Magnética ($\mu$)", font_size=36, color=BLUE)
         title_permeabilidade.to_edge(UP)
         self.play(Write(title_permeabilidade))
-        self.wait(1)
+        self.esperar_texto(1, "Permeabilidade Magnética")
 
         text_perm_def = VGroup(
             Tex(r"A permeabilidade magnética mede a capacidade de um material", font_size=24),
             Tex(r"de permitir a formação de um campo magnético em seu interior.", font_size=24)
         ).arrange(DOWN, aligned_edge=LEFT).next_to(title_permeabilidade, DOWN, buff=0.5)
         self.play(Write(text_perm_def))
-        self.wait(3)
+        self.esperar_texto(
+            3,
+            "A permeabilidade magnética mede a capacidade de um material",
+            "de permitir a formação de um campo magnético em seu interior"
+        )
 
         # Relação B e H
         eq_bh = MathTex(r"\vec{b} = \mu \vec{h}", font_size=40).next_to(text_perm_def, DOWN, buff=1)
@@ -147,7 +173,12 @@ class LorentzPermeabilidade(Scene):
             FadeIn(text_h),
             FadeIn(text_mu)
         )
-        self.wait(2)
+        self.esperar_texto(
+            2,
+            "b: Densidade de Fluxo Magnético (Tesla)",
+            "h: Intensidade de Campo Magnético (A/m)",
+            "mu: Permeabilidade Magnética (H/m)"
+        )
 
         # Mu_0 e Mu_r
         eq_mu_breakdown = MathTex(r"\mu = \mu_0 \cdot \mu_r",font_size=36).move_to(eq_bh) # Troca a equação anterior por esta
@@ -160,13 +191,18 @@ class LorentzPermeabilidade(Scene):
             Transform(eq_bh, eq_mu_breakdown),
             FadeOut(text_b), FadeOut(text_h), FadeOut(text_mu),
             FadeIn(text_mu0), FadeIn(text_mur))
-        self.wait(3)
+        self.esperar_texto(
+            3,
+            "mu = mu_0 x mu_r",
+            "mu_0: Permeabilidade do vácuo",
+            "mu_r: Permeabilidade relativa do material"
+        )
         
         final_note = Tex(
             "Materiais ferromagnéticos possuem $\mu_r$ muito alto!",
             font_size=24, color=ORANGE).next_to(text_mur, DOWN, buff=0.5)
         self.play(Write(final_note))
-        self.wait(3)
+        self.esperar_texto(3, "Materiais ferromagnéticos possuem mu_r muito alto")
 
         # Limpar a cena para Permissividade
         self.play(
@@ -182,14 +218,18 @@ class LorentzPermeabilidade(Scene):
         title_permissividade = Tex("Permissividade Elétrica ($\epsilon$)", font_size=36, color=PURPLE)
         title_permissividade.to_edge(UP)
         self.play(Write(title_permissividade))
-        self.wait(1)
+        self.esperar_texto(1, "Permissividade Elétrica")
 
         text_perm_def = VGroup(
             Tex(r"A permissividade elétrica mede a capacidade de um material", font_size=24),
             Tex(r"de permitir o armazenamento de energia em um campo elétrico.", font_size=24)
         ).arrange(DOWN, aligned_edge=LEFT).next_to(title_permissividade, DOWN, buff=0.5)
         self.play(Write(text_perm_def))
-        self.wait(3)
+        self.esperar_texto(
+            3,
+            "A permissividade elétrica mede a capacidade de um material",
+            "de permitir o armazenamento de energia em um campo elétrico"
+        )
 
         # Relação D e E
         eq_de = MathTex(r"\vec{d} = \epsilon \vec{e}", font_size=40).next_to(text_perm_def, DOWN, buff=1)
@@ -206,7 +246,12 @@ class LorentzPermeabilidade(Scene):
             FadeIn(text_e),
             FadeIn(text_eps)
         )
-        self.wait(2)
+        self.esperar_texto(
+            2,
+            "d: Densidade de Fluxo Elétrico (C/m^2)",
+            "e: Intensidade de Campo Elétrico (V/m)",
+            "epsilon: Permissividade Elétrica (F/m)"
+        )
 
         # Epsilon_0 e Epsilon_r
         eq_eps_breakdown = MathTex(r"\epsilon = \epsilon_0 \cdot \epsilon_r",font_size=36).move_to(eq_de)
@@ -219,13 +264,18 @@ class LorentzPermeabilidade(Scene):
             Transform(eq_de, eq_eps_breakdown),
             FadeOut(text_d), FadeOut(text_e), FadeOut(text_eps),
             FadeIn(text_eps0), FadeIn(text_epsr))
-        self.wait(3)
+        self.esperar_texto(
+            3,
+            "epsilon = epsilon_0 x epsilon_r",
+            "epsilon_0: Permissividade do vácuo",
+            "epsilon_r: Permissividade relativa do material"
+        )
         
         final_note = Tex(
             "Materiais dielétricos possuem $\epsilon_r \ge 1$.",
             font_size=24, color=ORANGE).next_to(text_epsr, DOWN, buff=0.5)
         self.play(Write(final_note))
-        self.wait(3)
+        self.esperar_texto(3, "Materiais dielétricos possuem epsilon_r maior ou igual a 1")
 
         self.play(
             FadeOut(title_permissividade),
@@ -240,14 +290,18 @@ class LorentzPermeabilidade(Scene):
         title_condutividade = Tex("Condutividade Elétrica ($\sigma$)", font_size=36, color=GREEN)
         title_condutividade.to_edge(UP)
         self.play(Write(title_condutividade))
-        self.wait(1)
+        self.esperar_texto(1, "Condutividade Elétrica")
 
         text_cond_def = VGroup(
             Tex(r"A condutividade elétrica mede a facilidade com que", font_size=24),
             Tex(r"cargas elétricas se movem através de um material.", font_size=24)
         ).arrange(DOWN, aligned_edge=LEFT).next_to(title_condutividade, DOWN, buff=0.5)
         self.play(Write(text_cond_def))
-        self.wait(3)
+        self.esperar_texto(
+            3,
+            "A condutividade elétrica mede a facilidade com que",
+            "cargas elétricas se movem através de um material"
+        )
 
         # Lei de Ohm Micro
         eq_je = MathTex(r"\vec{j} = \sigma \vec{e}", font_size=40).next_to(text_cond_def, DOWN, buff=1)
@@ -264,7 +318,12 @@ class LorentzPermeabilidade(Scene):
             FadeIn(text_e),
             FadeIn(text_sigma)
         )
-        self.wait(2)
+        self.esperar_texto(
+            2,
+            "j: Densidade de Corrente (A/m^2)",
+            "e: Intensidade de Campo Elétrico (V/m)",
+            "sigma: Condutividade Elétrica (S/m)"
+        )
 
         # Resistividade
         eq_res_breakdown = MathTex(r"\sigma = \frac{1}{\rho}",font_size=36).move_to(eq_je)
@@ -277,13 +336,13 @@ class LorentzPermeabilidade(Scene):
             Transform(eq_je, eq_res_breakdown),
             FadeOut(text_j), FadeOut(text_e), FadeOut(text_sigma),
             FadeIn(text_rho))
-        self.wait(3)
+        self.esperar_texto(3, "sigma = 1/rho", "rho: Resistividade Elétrica")
         
         final_note = Tex(
             r"Condutores perfeitos teriam $\sigma \to \infty$.",
             font_size=24, color=ORANGE).next_to(text_rho, DOWN, buff=0.5)
         self.play(Write(final_note))
-        self.wait(3)
+        self.esperar_texto(3, "Condutores perfeitos teriam sigma tendendo ao infinito")
 
         self.play(
             FadeOut(title_condutividade),
@@ -297,7 +356,7 @@ class LorentzPermeabilidade(Scene):
         title_relacoes = Tex("Relações Constitutivas", font_size=36, color=WHITE)
         title_relacoes.to_edge(UP)
         self.play(Write(title_relacoes))
-        self.wait(1)
+        self.esperar_texto(1, "Relações Constitutivas")
 
         # Equações
         eq_d = MathTex(r"\vec{d} = \epsilon \vec{e}", font_size=30)
@@ -320,7 +379,15 @@ class LorentzPermeabilidade(Scene):
             FadeIn(group_b),
             FadeIn(group_j)
         )
-        self.wait(2)
+        self.esperar_texto(
+            2,
+            "Permissividade (epsilon)",
+            "Permeabilidade (mu)",
+            "Condutividade (sigma)",
+            "d = epsilon e",
+            "b = mu h",
+            "j = sigma e"
+        )
         
         rect = SurroundingRectangle(all_eqs, buff=0.3, color=WHITE)
         text_summary = Tex(
@@ -328,7 +395,7 @@ class LorentzPermeabilidade(Scene):
             font_size=26).next_to(rect, DOWN, buff=0.5)
             
         self.play(Create(rect), Write(text_summary))
-        self.wait(3)
+        self.esperar_texto(3, "Essas propriedades caracterizam o meio material")
 
         self.play(
             FadeOut(title_relacoes),
