@@ -1,0 +1,11 @@
+{
+  "hosting": {
+    "public": "public",
+    "site": "emag-unifei",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
