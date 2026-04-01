@@ -1,343 +1,648 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Eletromagnetismo – UNIFEI</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Eletromagnetismo – UNIFEI</title>
 
-  <!-- Syntax highlighting (highlight.js) -->
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <!-- Syntax highlighting (highlight.js) -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
 
-  <style>
-    /* ── Base ── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg:        #0d1117;
-      --surface:   #161b22;
-      --border:    #30363d;
-      --accent:    #58a6ff;
-      --accent2:   #3fb950;
-      --text:      #e6edf3;
-      --muted:     #8b949e;
-      --radius:    10px;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2.5rem 1.25rem 4rem;
-    }
-
-    /* ── Header ── */
-    header {
-      text-align: center;
-      margin-bottom: 3rem;
-      max-width: 700px;
-    }
-
-    header h1 {
-      font-size: clamp(1.5rem, 4vw, 2.4rem);
-      font-weight: 800;
-      letter-spacing: 0.06em;
-      color: var(--accent);
-      text-transform: uppercase;
-      margin-bottom: 0.75rem;
-    }
-
-    header .byline {
-      font-size: 0.95rem;
-      color: var(--muted);
-    }
-
-    header .byline a {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 600;
-      border-bottom: 1px solid transparent;
-      transition: border-color .2s;
-    }
-    header .byline a:hover { border-color: var(--accent); }
-
-    .social-links {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin-top: 0.6rem;
-      flex-wrap: wrap;
-    }
-
-    .social-links a {
-      color: var(--muted);
-      font-size: 0.85rem;
-      text-decoration: none;
-      padding: 0.25rem 0.6rem;
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      transition: color .2s, border-color .2s;
-    }
-    .social-links a:hover { color: var(--accent); border-color: var(--accent); }
-
-    /* ── Gallery grid ── */
-    .gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(min(100%, 520px), 1fr));
-      gap: 2rem;
-      width: 100%;
-      max-width: 1120px;
-    }
-
-    /* ── Video card ── */
-    .video-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      transition: border-color .25s, box-shadow .25s;
-    }
-    .video-card:hover {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px var(--accent);
-    }
-
-    .video-card video {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      background: #000;
-      display: block;
-    }
-
-    .card-body {
-      padding: 1rem 1.25rem 1.25rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      flex: 1;
-    }
-
-    .card-body h2 {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--text);
-      line-height: 1.4;
-    }
-
-    .card-footer {
-      display: flex;
-      justify-content: flex-end;
-    }
-
-    /* ── Source-code button ── */
-    .btn-code {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      background: transparent;
-      color: var(--accent2);
-      border: 1px solid var(--accent2);
-      border-radius: 6px;
-      padding: 0.4rem 0.9rem;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background .2s, color .2s;
-    }
-    .btn-code:hover {
-      background: var(--accent2);
-      color: #0d1117;
-    }
-    .btn-code svg { flex-shrink: 0; }
-
-    /* ── Dialog / Modal ── */
-    dialog {
-      background: var(--surface);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 0;
-      max-width: min(900px, 96vw);
-      width: 100%;
-      max-height: 90vh;
-    }
-    dialog[open] {
-      display: flex;
-      flex-direction: column;
-    }
-    dialog::backdrop {
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(3px);
-    }
-
-    .dialog-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.9rem 1.25rem;
-      border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-
-    .dialog-header h3 {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--muted);
-    }
-    .dialog-header h3 span { color: var(--text); }
-
-    .btn-close {
-      background: transparent;
-      border: none;
-      color: var(--muted);
-      cursor: pointer;
-      font-size: 1.4rem;
-      line-height: 1;
-      padding: 0.1rem 0.3rem;
-      border-radius: 4px;
-      transition: color .15s, background .15s;
-    }
-    .btn-close:hover { color: var(--text); background: var(--border); }
-
-    .dialog-body {
-      overflow-y: auto;
-      flex: 1;
-    }
-
-    .dialog-body pre {
-      margin: 0;
-      border-radius: 0;
-    }
-    .dialog-body pre code.hljs {
-      font-size: 0.82rem;
-      line-height: 1.6;
-      padding: 1.25rem 1.5rem;
-    }
-  </style>
-</head>
-<body>
-
-  <!-- ══ Header ══ -->
-  <header>
-    <h1>Eletromagnetismo – UNIFEI</h1>
-    <p class="byline">
-      Vídeos produzidos por
-      <!-- UPDATE: replace # with your actual profile URL -->
-      <a href="#" target="_blank" rel="noopener">Fabio Ramalho</a>
-    </p>
-    <nav class="social-links" aria-label="Perfis sociais">
-      <!-- UPDATE: replace # with your actual profile URLs -->
-      <a href="#" target="_blank" rel="noopener">GitHub</a>
-      <a href="#" target="_blank" rel="noopener">LinkedIn</a>
-      <a href="#" target="_blank" rel="noopener">YouTube</a>
-    </nav>
-  </header>
-
-  <!-- ══ Gallery ══ -->
-  <main class="gallery">
-
-    <!-- ── Video 1 ── -->
-    <article class="video-card">
-      <video controls preload="metadata">
-        <source src="videos/aula-1-lorentz-e-constitutivas.mp4" type="video/mp4" />
-        Seu navegador não suporta o elemento de vídeo.
-      </video>
-      <div class="card-body">
-        <h2>Aula 1 – Força de Lorentz e Equações Constitutivas</h2>
-        <div class="card-footer">
-          <button class="btn-code"
-                  onclick="showCode('codes/aula_1_lorentz_e_constitutivas.py',
-                                   'Aula 1 – Força de Lorentz e Equações Constitutivas')">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-              <path d="M4.78 12.53 1.25 9l3.53-3.53-1.06-1.06L-.06 9l4.78 4.59 1.06-1.06zm6.44 0L14.75 9l-3.53-3.53 1.06-1.06L16.06 9l-4.78 4.59-1.06-1.06z"/>
-            </svg>
-            Código-fonte
-          </button>
-        </div>
-      </div>
-    </article>
-
-    <!-- ── Video 2 ── -->
-    <article class="video-card">
-      <video controls preload="metadata">
-        <source src="videos/aula-2-equacoes-maxwell.mp4" type="video/mp4" />
-        Seu navegador não suporta o elemento de vídeo.
-      </video>
-      <div class="card-body">
-        <h2>Aula 2 – Equações de Maxwell e Cálculo Vetorial</h2>
-        <div class="card-footer">
-          <button class="btn-code"
-                  onclick="showCode('codes/aula_2_maxwell_e_calculo.py',
-                                   'Aula 2 – Equações de Maxwell e Cálculo Vetorial')">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-              <path d="M4.78 12.53 1.25 9l3.53-3.53-1.06-1.06L-.06 9l4.78 4.59 1.06-1.06zm6.44 0L14.75 9l-3.53-3.53 1.06-1.06L16.06 9l-4.78 4.59-1.06-1.06z"/>
-            </svg>
-            Código-fonte
-          </button>
-        </div>
-      </div>
-    </article>
-
-    <!--
-      ══ ADD MORE VIDEOS HERE ══
-      Copy one of the <article> blocks above and update:
-        • <source src="videos/YOUR-VIDEO.mp4">
-        • <h2> title </h2>
-        • showCode('codes/YOUR_SCRIPT.py', 'Title shown in dialog')
-    -->
-  </main>
-
-  <!-- ══ Source-code dialog ══ -->
-  <dialog id="code-dialog" aria-modal="true" aria-labelledby="dialog-title">
-    <div class="dialog-header">
-      <h3 id="dialog-title">Código-fonte — <span id="dialog-video-title"></span></h3>
-      <button class="btn-close" onclick="closeCodeDialog()" aria-label="Fechar">&#x2715;</button>
-    </div>
-    <div class="dialog-body">
-      <pre><code id="dialog-code" class="language-python"></code></pre>
-    </div>
-  </dialog>
-
-  <script>
-    const dialog    = document.getElementById('code-dialog');
-    const codeEl    = document.getElementById('dialog-code');
-    const titleEl   = document.getElementById('dialog-video-title');
-
-    async function showCode(path, videoTitle) {
-      try {
-        const res = await fetch(path);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const text = await res.text();
-
-        titleEl.textContent = videoTitle;
-        codeEl.textContent  = text;          // set plain text first …
-        hljs.highlightElement(codeEl);       // … then highlight
-        dialog.showModal();
-      } catch (err) {
-        alert('Não foi possível carregar o código-fonte.\n' + err.message);
+    <style>
+      /* ── Base ── */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
       }
-    }
 
-    function closeCodeDialog() { dialog.close(); }
+      :root {
+        --bg: #0d1117;
+        --surface: #161b22;
+        --border: #30363d;
+        --accent: #58a6ff;
+        --accent2: #3fb950;
+        --text: #e6edf3;
+        --muted: #8b949e;
+        --radius: 10px;
+      }
 
-    // Close on backdrop click
-    dialog.addEventListener('click', e => {
-      if (e.target === dialog) dialog.close();
-    });
+      /* Version themes */
+      body.v1 {
+        --accent: #58a6ff; /* Blue */
+        --accent2: #3fb950;
+      }
 
-    // Close on Escape (native behaviour, but reset highlight state cleanly)
-    dialog.addEventListener('close', () => {
-      codeEl.textContent = '';
-      codeEl.removeAttribute('data-highlighted');
-    });
-  </script>
-</body>
+      body.v2 {
+        --accent: #f78166; /* Orange/Red */
+        --accent2: #d2a8ff; /* Purple */
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Segoe UI", system-ui, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 2.5rem 1.25rem 4rem;
+        transition: background 0.3s;
+      }
+
+      /* ── Tabs ── */
+      .tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        background: var(--surface);
+        padding: 0.3rem;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+      }
+
+      .tab-btn {
+        padding: 0.6rem 1.5rem;
+        border: none;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        font-weight: 600;
+        border-radius: 6px;
+        transition: all 0.2s;
+      }
+
+      .tab-btn.active {
+        background: var(--border);
+        color: var(--accent);
+      }
+
+      .gallery-set {
+        display: none;
+        width: 100%;
+        max-width: 1120px;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .gallery-set.active {
+        display: grid;
+      }
+
+
+      /* ── Header ── */
+      header {
+        text-align: center;
+        margin-bottom: 3rem;
+        max-width: 700px;
+      }
+
+      header h1 {
+        font-size: clamp(1.5rem, 4vw, 2.4rem);
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        color: var(--accent);
+        text-transform: uppercase;
+        margin-bottom: 0.75rem;
+      }
+
+      header .byline {
+        font-size: 0.95rem;
+        color: var(--muted);
+      }
+
+      header .byline a {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 600;
+        border-bottom: 1px solid transparent;
+        transition: border-color 0.2s;
+      }
+      header .byline a:hover {
+        border-color: var(--accent);
+      }
+
+      .social-links {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 0.6rem;
+        flex-wrap: wrap;
+      }
+
+      .social-links a {
+        color: var(--muted);
+        font-size: 0.85rem;
+        text-decoration: none;
+        padding: 0.25rem 0.6rem;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        transition:
+          color 0.2s,
+          border-color 0.2s;
+      }
+      .social-links a:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      /* ── Gallery grid ── */
+      .gallery {
+        display: block;
+        width: 100%;
+        max-width: 1200px;
+      }
+
+      /* ── Video card ── */
+      .video-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition:
+          border-color 0.25s,
+          box-shadow 0.25s;
+      }
+      .video-card:hover {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 1px var(--accent);
+      }
+
+      .video-card video {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        background: #000;
+        display: block;
+      }
+
+      .card-body {
+        padding: 1rem 1.25rem 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        flex: 1;
+      }
+
+      .card-body h2 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.4;
+      }
+
+      .card-footer {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      /* ── Source-code button ── */
+      .btn-code {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: transparent;
+        color: var(--accent2);
+        border: 1px solid var(--accent2);
+        border-radius: 6px;
+        padding: 0.4rem 0.9rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          color 0.2s;
+      }
+      .btn-code:hover {
+        background: var(--accent2);
+        color: #0d1117;
+      }
+      .btn-code svg {
+        flex-shrink: 0;
+      }
+
+      /* ── Dialog / Modal ── */
+      dialog {
+        background: var(--surface);
+        color: var(--text);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 0;
+        max-width: min(900px, 96vw);
+        width: 100%;
+        max-height: 90vh;
+      }
+      dialog[open] {
+        display: flex;
+        flex-direction: column;
+      }
+      dialog::backdrop {
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(3px);
+      }
+
+      .dialog-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.9rem 1.25rem;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+
+      .dialog-header h3 {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--muted);
+      }
+      .dialog-header h3 span {
+        color: var(--text);
+      }
+
+      .btn-close {
+        background: transparent;
+        border: none;
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 1.4rem;
+        line-height: 1;
+        padding: 0.1rem 0.3rem;
+        border-radius: 4px;
+        transition:
+          color 0.15s,
+          background 0.15s;
+      }
+      .btn-close:hover {
+        color: var(--text);
+        background: var(--border);
+      }
+
+      .dialog-body {
+        overflow-y: auto;
+        flex: 1;
+      }
+
+      .dialog-body pre {
+        margin: 0;
+        border-radius: 0;
+      }
+      .dialog-body pre code.hljs {
+        font-size: 0.82rem;
+        line-height: 1.6;
+        padding: 1.25rem 1.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ══ Header ══ -->
+    <header>
+      <h1>Eletromagnetismo – UNIFEI</h1>
+      <p class="byline">
+        Vídeos produzidos por
+        <!-- UPDATE: replace # with your actual profile URL -->
+        <a href="#" target="_blank" rel="noopener">Fabio Ramalho</a>
+      </p>
+      <nav class="social-links" aria-label="Perfis sociais">
+        <!-- UPDATE: replace # with your actual profile URLs -->
+
+        <a
+          href="https://github.com/fabiorx1/emag"
+          target="_blank"
+          rel="noopener"
+          >GitHub</a
+        >
+        <a
+          href="https://www.linkedin.com/in/coachxuxa/"
+          target="_blank"
+          rel="noopener"
+          >LinkedIn</a
+        >
+        <a
+          href="https://www.instagram.com/coachxuxa/"
+          target="_blank"
+          rel="noopener"
+          >Instagram</a
+        >
+      </nav>
+    </header>
+
+    <!-- ══ Tabs ══ -->
+    <nav class="tabs">
+      <button class="tab-btn active" onclick="switchTheme('v2')">V2</button>
+      <button class="tab-btn" onclick="switchTheme('v1')">V1</button>
+    </nav>
+
+    <!-- ══ Gallery ══ -->
+    <main class="gallery">
+      <!-- ── V2 Video Set ── -->
+      <div id="v2-gallery" class="gallery-set active">
+        <!-- ── Video 1 (V2) ── -->
+        <article class="video-card">
+          <video controls preload="metadata">
+            <source src="videos/v2/1_cargas.mp4" type="video/mp4" />
+          </video>
+          <div class="card-body">
+            <h2>Aula 1 – Cargas Elétricas</h2>
+            <div class="card-footer">
+              <button
+                class="btn-code"
+                onclick="showCode('codes/v2/1_cargas.py', 'Aula 1 – Cargas Elétricas')"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 16 16"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M4.78 12.53 1.25 9l3.53-3.53-1.06-1.06L-.06 9l4.78 4.59 1.06-1.06zm6.44 0L14.75 9l-3.53-3.53 1.06-1.06L16.06 9l-4.78 4.59-1.06-1.06z"
+                  />
+                </svg>
+                Código-fonte
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <!-- ── Video 2 (V2) ── -->
+        <article class="video-card">
+          <video controls preload="metadata">
+            <source
+              src="videos/v2/2_eletromagnetismo.mp4"
+              type="video/mp4"
+            />
+          </video>
+          <div class="card-body">
+            <h2>Aula 2 – Fundamentos do Eletromagnetismo</h2>
+            <div class="card-footer">
+              <button
+                class="btn-code"
+                onclick="showCode('codes/v2/2_eletromagnetismo.py', 'Aula 2 – Fundamentos do Eletromagnetismo')"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 16 16"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M4.78 12.53 1.25 9l3.53-3.53-1.06-1.06L-.06 9l4.78 4.59 1.06-1.06zm6.44 0L14.75 9l-3.53-3.53 1.06-1.06L16.06 9l-4.78 4.59-1.06-1.06z"
+                  />
+                </svg>
+                Código-fonte
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <!-- ── Video 3 (V2) ── -->
+        <article class="video-card">
+          <video controls preload="metadata">
+            <source
+              src="videos/v2/3_c_alternada.mp4"
+              type="video/mp4"
+            />
+          </video>
+          <div class="card-body">
+            <h2>Aula 3 – Corrente Alternada</h2>
+            <div class="card-footer">
+              <button
+                class="btn-code"
+                onclick="showCode('codes/v2/3_c_alternada.py', 'Aula 3 – Corrente Alternada')"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 16 16"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M4.78 12.53 1.25 9l3.53-3.53-1.06-1.06L-.06 9l4.78 4.59 1.06-1.06zm6.44 0L14.75 9l-3.53-3.53 1.06-1.06L16.06 9l-4.78 4.59-1.06-1.06z"
+                  />
+                </svg>
+                Código-fonte
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <!-- ── Video 4 (V2) ── -->
+        <article class="video-card">
+          <video controls preload="metadata">
+            <source src="videos/v2/4_geracao.mp4" type="video/mp4" />
+          </video>
+          <div class="card-body">
+            <h2>Aula 4 – Geração de Ondas</h2>
+            <div class="card-footer">
+              <button
+                class="btn-code"
+                onclick="showCode('codes/v2/4_geracao.py', 'Aula 4 – Geração de Ondas')"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 16 16"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M4.78 12.53 1.25 9l3.53-3.53-1.06-1.06L-.06 9l4.78 4.59 1.06-1.06zm6.44 0L14.75 9l-3.53-3.53 1.06-1.06L16.06 9l-4.78 4.59-1.06-1.06z"
+                  />
+                </svg>
+                Código-fonte
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <!-- ── Video 5 (V2) ── -->
+        <article class="video-card">
+          <video controls preload="metadata">
+            <source src="videos/v2/5_propagacao.mp4" type="video/mp4" />
+          </video>
+          <div class="card-body">
+            <h2>Aula 5 – Propagação em Meios</h2>
+            <div class="card-footer">
+              <button
+                class="btn-code"
+                onclick="showCode('codes/v2/5_propagacao.py', 'Aula 5 – Propagação em Meios')"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 16 16"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M4.78 12.53 1.25 9l3.53-3.53-1.06-1.06L-.06 9l4.78 4.59 1.06-1.06zm6.44 0L14.75 9l-3.53-3.53 1.06-1.06L16.06 9l-4.78 4.59-1.06-1.06z"
+                  />
+                </svg>
+                Código-fonte
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- ── V1 Video Set ── -->
+      <div id="v1-gallery" class="gallery-set">
+        <!-- ── Video 1 (V1) ── -->
+        <article class="video-card">
+          <video controls preload="metadata">
+            <source
+              src="videos/v1/aula-1-lorentz-e-constitutivas.mp4"
+              type="video/mp4"
+            />
+            Seu navegador não suporta o elemento de vídeo.
+          </video>
+          <div class="card-body">
+            <h2>Aula 1 – Força de Lorentz e Equações Constitutivas</h2>
+            <div class="card-footer">
+              <button
+                class="btn-code"
+                onclick="
+                showCode(
+                  'codes/v1/aula_1_lorentz_e_constitutivas.py',
+                  'Aula 1 – Força de Lorentz e Equações Constitutivas',
+                )
+              "
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 16 16"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M4.78 12.53 1.25 9l3.53-3.53-1.06-1.06L-.06 9l4.78 4.59 1.06-1.06zm6.44 0L14.75 9l-3.53-3.53 1.06-1.06L16.06 9l-4.78 4.59-1.06-1.06z"
+                  />
+                </svg>
+                Código-fonte
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <!-- ── Video 2 (V1) ── -->
+        <article class="video-card">
+          <video controls preload="metadata">
+            <source
+              src="videos/v1/aula-2-equacoes-maxwell.mp4"
+              type="video/mp4"
+            />
+            Seu navegador não suporta o elemento de vídeo.
+          </video>
+          <div class="card-body">
+            <h2>Aula 2 – Equações de Maxwell e Cálculo Vetorial</h2>
+            <div class="card-footer">
+              <button
+                class="btn-code"
+                onclick="
+                showCode(
+                  'codes/v1/aula_2_maxwell_e_calculo.py',
+                  'Aula 2 – Equações de Maxwell e Cálculo Vetorial',
+                )
+              "
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 16 16"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M4.78 12.53 1.25 9l3.53-3.53-1.06-1.06L-.06 9l4.78 4.59 1.06-1.06zm6.44 0L14.75 9l-3.53-3.53 1.06-1.06L16.06 9l-4.78 4.59-1.06-1.06z"
+                  />
+                </svg>
+                Código-fonte
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </main>
+
+
+    <!-- ══ Source-code dialog ══ -->
+    <dialog id="code-dialog" aria-modal="true" aria-labelledby="dialog-title">
+      <div class="dialog-header">
+        <h3 id="dialog-title">
+          Código-fonte — <span id="dialog-video-title"></span>
+        </h3>
+        <button
+          class="btn-close"
+          onclick="closeCodeDialog()"
+          aria-label="Fechar"
+        >
+          &#x2715;
+        </button>
+      </div>
+      <div class="dialog-body">
+        <pre><code id="dialog-code" class="language-python"></code></pre>
+      </div>
+    </dialog>
+
+    <script>
+      const dialog = document.getElementById("code-dialog");
+      const codeEl = document.getElementById("dialog-code");
+      const titleEl = document.getElementById("dialog-video-title");
+
+      function switchTheme(version) {
+        // Update body class
+        document.body.className = version;
+
+        // Update tabs
+        document.querySelectorAll(".tab-btn").forEach((btn) => {
+          btn.classList.toggle("active", btn.textContent.toLowerCase() === version);
+        });
+
+        // Update galleries
+        document.querySelectorAll(".gallery-set").forEach((set) => {
+          set.classList.toggle("active", set.id === `${version}-gallery`);
+        });
+      }
+
+      // Initialize with v2
+      window.addEventListener("DOMContentLoaded", () => switchTheme("v2"));
+
+      async function showCode(path, videoTitle) {
+        try {
+          const res = await fetch(path);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const text = await res.text();
+
+          titleEl.textContent = videoTitle;
+          codeEl.textContent = text; // set plain text first …
+          hljs.highlightElement(codeEl); // … then highlight
+          dialog.showModal();
+        } catch (err) {
+          alert("Não foi possível carregar o código-fonte.\n" + err.message);
+        }
+      }
+
+      function closeCodeDialog() {
+        dialog.close();
+      }
+
+      // Close on backdrop click
+      dialog.addEventListener("click", (e) => {
+        if (e.target === dialog) dialog.close();
+      });
+
+      // Close on Escape (native behaviour, but reset highlight state cleanly)
+      dialog.addEventListener("close", () => {
+        codeEl.textContent = "";
+        codeEl.removeAttribute("data-highlighted");
+      });
+    </script>
+  </body>
 </html>
