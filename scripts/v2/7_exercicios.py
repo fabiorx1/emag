@@ -39,6 +39,9 @@ class ExerciciosScene(Scene):
 		self.cena_2_exercicios_1_2_3()
 		self.clean_up()
 
+		self.cena_1_5_espectro_materiais()
+		self.clean_up()
+
 		self.cena_3_exercicio_5()
 		self.clean_up()
 
@@ -357,6 +360,91 @@ class ExerciciosScene(Scene):
 		self.play(Create(self.formula_box(VGroup(result, unit), color=C_GREEN)[0]))
 		self.wait(2.5)
 
+	def cena_1_5_espectro_materiais(self):
+		header = self.scene_title("Espectro de Frequências", "Visualizando a transição entre comportamentos")
+		self.play(Write(header))
+
+		# Configuração Logarítmica dos Eixos
+		# Eixo X mapeado linearmente nas potências de 10 (f_exp variando de 3 a 11)
+		# Eixo Y mapeado linearmente nas potências de 10 da Razão de Correntes (y de -4 a 10)
+		ax = Axes(
+			x_range=[3, 11, 2],
+			y_range=[-4, 10, 2],
+			x_length=9.5,
+			y_length=5.5,
+			axis_config={"include_tip": True, "color": FG},
+		).shift(DOWN * 0.1 + RIGHT * 0.2)
+
+		# Adicionar valores formatados como potências de 10 para ambos os eixos
+		x_dict = {x: MathTex(rf"10^{{{x}}}", font_size=20, color=FG) for x in range(3, 12, 2)}
+		ax.x_axis.add_labels(x_dict)
+		
+		y_dict = {y: MathTex(rf"10^{{{y}}}", font_size=20, color=FG) for y in range(-4, 11, 2)}
+		ax.y_axis.add_labels(y_dict)
+
+		x_label = ax.get_x_axis_label(Text("f [Hz]", font_size=18, color=FG), edge=DOWN, direction=DOWN, buff=0.1)
+		y_label = ax.get_y_axis_label(MathTex(r"J_c/J_d", font_size=26, color=FG).rotate(90*DEGREES), edge=LEFT, direction=LEFT, buff=0.2)
+
+		# Regiões de Comportamento
+		region_cond = ax.get_area(
+			ax.plot(lambda x: 2, x_range=[3, 11]),
+			[3, 11],
+			bounded_graph=ax.plot(lambda x: 10, x_range=[3, 11]),
+			color=C_SIGMA, opacity=0.12
+		)
+		region_quasi = ax.get_area(
+			ax.plot(lambda x: -2, x_range=[3, 11]),
+			[3, 11],
+			bounded_graph=ax.plot(lambda x: 2, x_range=[3, 11]),
+			color=C_GOLD, opacity=0.08
+		)
+		region_diel = ax.get_area(
+			ax.plot(lambda x: -4, x_range=[3, 11]),
+			[3, 11],
+			bounded_graph=ax.plot(lambda x: -2, x_range=[3, 11]),
+			color=C_EPS, opacity=0.12
+		)
+
+		# Títulos de cada área alinhados por dentro do gráfico para não dar overflow horizontal
+		labels_regioes = VGroup(
+			Text("CONDUTOR", font_size=18, color=C_SIGMA, weight=BOLD).move_to(ax.c2p(9, 6)),
+			Text("QUASE-CONDUTOR", font_size=18, color=C_OMEGA, weight=BOLD).move_to(ax.c2p(9, 0)),
+			Text("DIELÉTRICO", font_size=18, color=C_EPS, weight=BOLD).move_to(ax.c2p(9, -3)),
+		)
+
+		self.play(Create(ax), Write(x_label), Write(y_label))
+		self.play(FadeIn(region_cond), FadeIn(region_quasi), FadeIn(region_diel), FadeIn(labels_regioes))
+
+		# Funções para plotagem: Ratio = sigma / (2 * pi * f * eps0 * epsr)
+		def get_ratio_log(f_exp, sigma, eps_r):
+			constant_part = np.log10(sigma / (2 * PI * eps_r * EPS0))
+			return constant_part - f_exp
+
+		# Ex 1: Água do mar (sigma=4, eps_r=81)
+		graph_mar = ax.plot(
+			lambda x: get_ratio_log(x, 4, 81),
+			x_range=[3, 11],
+			color=C_SIGMA,
+			stroke_width=5
+		)
+		# Colocando os labels próximos das curvas em posições visíveis
+		y_mar_label = get_ratio_log(4.5, 4, 81)
+		label_mar = Text("Água do Mar", font_size=18, color=C_SIGMA).next_to(ax.c2p(4.5, y_mar_label), UR, buff=0.15)
+
+		# Ex 2: Novo Material (sigma=1e-2, eps_r=10)
+		graph_novo = ax.plot(
+			lambda x: get_ratio_log(x, 1e-2, 10),
+			x_range=[3, 11],
+			color=C_EPS,
+			stroke_width=5
+		)
+		y_novo_label = get_ratio_log(4.5, 1e-2, 10)
+		label_novo = Text("Novo Material", font_size=18, color=C_EPS).next_to(ax.c2p(4.5, y_novo_label), DL, buff=0.15)
+
+		self.play(Create(graph_mar), Write(label_mar), run_time=2)
+		self.play(Create(graph_novo), Write(label_novo), run_time=2)
+		self.wait(2.5)
+
 	def cena_4_exercicio_6(self):
 		title = Text("Exercício 6: Encontrando H e deduzindo k", font_size=34, color=FG).to_edge(UP)
 		self.play(Write(title))
@@ -470,6 +558,21 @@ class ExerciciosScene(Scene):
 		self.play(Write(header[0]), FadeIn(guide, shift=UP * 0.1))
 		self.wait(0.5)
 
+		definitions = VGroup(
+			Text("Dados:", font_size=22, color=C_GOLD),
+			MathTex(r"\text{Meio não-magnético: } \mu = \mu_0", font_size=24),
+			MathTex(r"\text{Dielétrico perfeito: } \sigma = 0", font_size=24),
+			MathTex(r"\epsilon = 4\epsilon_0", font_size=24),
+			MathTex(r"\omega = 3109 \, \text{rad/s}", font_size=24)
+		).arrange(DOWN, aligned_edge=LEFT, buff=0.15).to_corner(UL, buff=0.4).shift(DOWN * 1.5)
+		
+		defs_box = SurroundingRectangle(definitions, color=C_GOLD, buff=0.2, stroke_width=2, corner_radius=0.1)
+		defs_box.set_fill(C_GOLD, opacity=0.05)
+		defs_group = VGroup(defs_box, definitions)
+		
+		self.play(FadeIn(defs_group, shift=RIGHT * 0.2))
+		self.wait(1.0)
+
 		inst = MathTex(
 			r"h = 50\cos(\omega t-kz)\hat{x} + 100\sin(\omega t-kz)\hat{y}",
 			font_size=32,
@@ -481,32 +584,32 @@ class ExerciciosScene(Scene):
 			r"\vec{H} = (50\hat{x} - i100\hat{y})e^{-ikz}",
 			font_size=32,
 			color=C_GREEN,
-		).move_to(inst)
+		).move_to(inst).shift(DOWN * 0.8)
 
-		self.play(TransformMatchingTex(inst, phasor_h_simple), run_time=1.2)
+		self.play(TransformFromCopy(inst, phasor_h_simple), run_time=1.2)
 		self.wait(1.0)
 
 		summary = RoundedRectangle(corner_radius=0.12, width=10.5, height=1.5, color=C_EPS, stroke_width=2)
 		summary.set_fill(C_PANEL, opacity=0.92)
-		summary.move_to(DOWN * 1.85)
+		summary.move_to(DOWN * 2.2)
 		summary_text = VGroup(
 			Text("Para achar E, aplicamos a Lei de Ampère no dielétrico", font_size=20, color=C_EPS),
 			MathTex(r"\sigma=0,\quad \epsilon=4\epsilon_0,\quad \nabla\times\vec{H}=i\omega(4\epsilon_0)\vec{E}", font_size=26),
 		).arrange(DOWN, buff=0.15).move_to(summary.get_center())
 
 		fast_label = Text("fast-forward", font_size=20, color=C_RED)
-		fast_label.move_to(RIGHT * 4.4 + DOWN * 0.45)
+		fast_label.move_to(RIGHT * 4.4 + DOWN * 0.8)
 		fast_arrow = Arrow(LEFT, RIGHT * 0.9, color=C_RED, buff=0.0, stroke_width=5).next_to(fast_label, DOWN, buff=0.1)
 		matrix_fast = MathTex(
 			r"\begin{vmatrix}\hat{x}&\hat{y}&\hat{z}\\ \partial_x&\partial_y&\partial_z\\ 50&-i100&0\end{vmatrix}",
 			font_size=22,
 			color=C_GOLD,
-		).move_to(DOWN * 0.45 + LEFT * 2.2)
+		).move_to(DOWN * 0.8 + LEFT * 2.2)
 		e_fast = MathTex(
 			r"\vec{E}=\left(-i\frac{100k}{4\omega\epsilon_0}\hat{x}-\frac{50k}{4\omega\epsilon_0}\hat{y}\right)e^{-ikz}",
 			font_size=26,
 			color=C_GREEN,
-		).move_to(DOWN * 0.45 + LEFT * 1.55)
+		).move_to(DOWN * 0.8 + LEFT * 1.55)
 		e_fast.scale_to_fit_width(6)
 
 		self.play(Create(summary), FadeIn(summary_text, shift=UP * 0.1))
@@ -520,7 +623,7 @@ class ExerciciosScene(Scene):
 
 		# Continuação: Determinando k e e(t)
 		self.play(
-			*[FadeOut(m) for m in [header, guide, summary, summary_text, fast_label, fast_arrow, e_fast_box]],
+			*[FadeOut(m) for m in [header, defs_group, guide, inst, phasor_h_simple, summary, summary_text, fast_label, fast_arrow, e_fast_box]],
 			run_time=1.2
 		)
 
@@ -531,7 +634,7 @@ class ExerciciosScene(Scene):
 
 		calc_k_title = self.caption("1. Calculando a constante de fase k", color=C_GOLD, font_size=20).next_to(e_fast, DOWN, buff=0.6).to_edge(LEFT, buff=0.8)
 		eq_k = MathTex(r"k = \omega\sqrt{\mu_0(4\epsilon_0)} = \frac{2\omega}{c}", font_size=28).next_to(calc_k_title, DOWN, buff=0.2).align_to(calc_k_title, LEFT).shift(RIGHT * 0.3)
-		eq_k_val = MathTex(r"k = \frac{2(3\cdot 10^9)}{3\cdot 10^8} = 20\,\text{rad/m}", font_size=28, color=C_OMEGA).next_to(eq_k, DOWN, buff=0.2).align_to(eq_k, LEFT)
+		eq_k_val = MathTex(r"k = \frac{2(3109)}{3\cdot 10^8} \approx 2.07\cdot 10^{-5}\,\text{rad/m}", font_size=28, color=C_OMEGA).next_to(eq_k, DOWN, buff=0.2).align_to(eq_k, LEFT)
 
 		self.play(FadeIn(calc_k_title, shift=RIGHT * 0.2))
 		self.play(Write(eq_k), run_time=1.2)
@@ -539,8 +642,8 @@ class ExerciciosScene(Scene):
 		self.wait(1.0)
 
 		calc_e_title = MathTex(r"\text{2. Substituindo os valores em }\vec{E}", font_size=20, color=C_GOLD).next_to(eq_k_val, DOWN, buff=0.6).align_to(calc_k_title, LEFT)
-		eq_e_final = MathTex(r"\vec{E} = (-i6000\pi\hat{x} - 3000\pi\hat{y})e^{-i20z}", font_size=28).next_to(calc_e_title, DOWN, buff=0.2).align_to(calc_e_title, LEFT).shift(RIGHT * 0.3)
-		eq_e_approx = MathTex(r"\vec{E} \approx (-i18850\hat{x} - 9425\hat{y})e^{-i20z}\,\,[\text{V/m}]", font_size=28, color=C_GREEN).next_to(eq_e_final, DOWN, buff=0.2).align_to(eq_e_final, LEFT)
+		eq_e_final = MathTex(r"\vec{E} = (-i6000\pi\hat{x} - 3000\pi\hat{y})e^{-i 2.07\cdot 10^{-5} z}", font_size=28).next_to(calc_e_title, DOWN, buff=0.2).align_to(calc_e_title, LEFT).shift(RIGHT * 0.3)
+		eq_e_approx = MathTex(r"\vec{E} \approx (-i18850\hat{x} - 9425\hat{y})e^{-i 2.07\cdot 10^{-5} z}\,\,[\text{V/m}]", font_size=28, color=C_GREEN).next_to(eq_e_final, DOWN, buff=0.2).align_to(eq_e_final, LEFT)
 
 		self.play(FadeIn(calc_e_title, shift=RIGHT * 0.2))
 		self.play(Write(eq_e_final), run_time=1.2)
@@ -549,7 +652,7 @@ class ExerciciosScene(Scene):
 
 		time_title = self.caption("3. Convertendo para a forma instantânea (Tempo)", color=C_GOLD, font_size=20).next_to(eq_e_approx, DOWN, buff=0.6).align_to(calc_k_title, LEFT)
 		eq_time = MathTex(
-			r"\vec{e}(z, t) = 18850\sin(\omega t - 20z)\hat{x} - 9425\cos(\omega t - 20z)\hat{y}\,\,[\text{V/m}]",
+			r"\vec{e}(z, t) = 18850\sin(3109 t - 2.07\cdot 10^{-5}z)\hat{x} - 9425\cos(3109 t - 2.07\cdot 10^{-5}z)\hat{y}\,\,[\text{V/m}]",
 			font_size=24,
 			color=C_PURPLE
 		).next_to(time_title, DOWN, buff=0.2).align_to(time_title, LEFT).shift(RIGHT * 0.3)

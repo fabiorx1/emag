@@ -13,6 +13,7 @@ uv.lock
 # MANIM
 media
 public/videos
+exports
 
 # FIREBASE
 .firebase
